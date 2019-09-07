@@ -2,8 +2,8 @@
 
 int main()
 {
-	printf("Hello world!!!");
-	printf("This is my first branch")
-	printf("The master modifies the record\n");
+	printf("Hello world!!!\n");
+	printf("This is my first branch\n");
+	printf("This is my second branch\n");
 	return 0;
 }
