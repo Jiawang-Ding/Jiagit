@@ -2,7 +2,8 @@
 
 int main()
 {
-	printf("Hello world!!!");
-	printf("This is my first branch")
+	printf("Hello world!!!\n");
+	printf("This is my first branch\n");
+	printf("This is my second branch\n");
 	return 0;
 }
