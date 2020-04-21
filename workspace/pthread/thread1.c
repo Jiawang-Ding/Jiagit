@@ -35,5 +35,6 @@ int main(){
     printf("Thread joined, it returned %s \n",(char*)thread_result);
     printf("Message is now %s\n",message);
 
+    printf("Hello master\n");
     return 0;
 }
