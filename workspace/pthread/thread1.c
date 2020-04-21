@@ -36,7 +36,7 @@ int main(){
     printf("Message is now %s\n",message);
 
     printf("Hello master\n");
-    //printf("Hello dev\n");
+    printf("Hello dev 1\n");
 
     return 0;
 }
