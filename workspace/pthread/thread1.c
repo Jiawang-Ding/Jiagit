@@ -35,7 +35,10 @@ int main(){
     printf("Thread joined, it returned %s \n",(char*)thread_result);
     printf("Message is now %s\n",message);
 
+<<<<<<< Updated upstream
     printf("Hello dev 1\n");
+=======
+>>>>>>> Stashed changes
 
     return 0;
 }
