@@ -1,0 +1,267 @@
+版本库相关概念：
+工作区（workspace） :就是电脑上包含.git所在的目录(.git隐藏目录版本库除外)。
+版本库（Repository）:工作区有一个隐藏目录.git,这个不属于工作区，这是版本库。
+暂存区（Stage）     :版本库目录（.git）下的stage目录就是暂存区
+
+
+初次运行配置git环境：
+git config --list                                      //查看git配置选型
+git config --global user.name "Jiawang_Ding"           //配置git用户名
+git config --global user.email "jiawang_ding@163.com"  //配置git用户邮箱
+git config --global core.editor "vim"                  //配置git编辑软件
+
+
+注意： --global 选项，那么该命令只需要运行一次，因为之后无论你在该系统上做任何事情， Git 都会使用那些信息。 当你想针对特定项目使用不同的用户名称与邮件地址时，可以在那个项目目录下运行没有 --global 选项的命令来配置
+
+这些是各种场合常见的 Git 命令：
+开始一个工作区（参见：git help tutorial）
+  clone      克隆一个仓库到一个新目录
+  init      创建一个空的 Git 仓库或重新初始化一个已存在的仓库
+
+
+在当前变更上工作（参见：git help everyday）
+  add        添加文件内容至索引
+  mv        移动或重命名一个文件、目录或符号链接
+  reset      重置当前 HEAD 到指定状态
+  rm        从工作区和索引中删除文件
+
+检查历史和状态（参见：git help revisions）
+  bisect    通过二分查找定位引入 bug 的提交
+  grep      输出和模式匹配的行
+  log       显示提交日志
+  show      显示各种类型的对象
+  status    显示工作区状态
+
+扩展、标记和调校您的历史记录
+  branch    列出、创建或删除分支
+  checkout  切换分支或恢复工作区文件
+  commit    记录变更到仓库
+  diff      显示提交之间、提交和工作区之间等的差异
+  merge      合并两个或更多开发历史
+  rebase    在另一个分支上重新应用提交
+  tag        创建、列出、删除或校验一个 GPG 签名的标签对象
+
+协同（参见：git help workflows）
+  fetch      从另外一个仓库下载对象和引用
+  pull      获取并整合另外的仓库或一个本地分支
+  push      更新远程引用和相关的对象
+
+
+命令 'git help -a' 和 'git help -g' 显示可用的子命令和一些概念帮助。
+查看 'git help <命令>' 或 'git help <概念>' 以获取给定子命令或概念的
+帮助。
+
+
+具体使用示例：
+/**************************************** 本地版本库操作 ***********************************************/
+情景1：使用Git提交文件到本地版本库：
+
+git add "temp.txt"                    //把"temp.txt"文件从 工作区 添加到 暂存区
+
+git commit -m "提交temp.txt到版本库"  //使用git commit提交更改，实际上就是把 暂存区 的所有内容提交到本地版本库
+                                        -m 后的内容是此次修改的说明
+
+git status                            //查看当前工作区状态
+
+
+情景2：本地版本库中的 temp.txt 文件内容被修改后
+
+git status                            //可查看当前工作区那些文件被修改，且并未提交
+
+git diff temp.txt                     //查看temp.txt文件那些内容被修改
+
+git add "temp.txt"                    //把"temp.txt"文件从 工作区 添加到 暂存区
+
+git commit -m "修改了temp.txt"        //把 暂存区 的所有内容 提交到 本地版本库
+
+
+情景3：使用简单命令，版本库版本回退
+
+git log                               //详细显示提交日志
+or
+git log --pretty=oneline               //简单显示提交日志
+
+git reset --hard HEAD^                //退回到上一个版本
+
+git reset --hard HEAD^^               //退回到上上个版本
+
+git log                               //查看提交日志，确定版本是否已被回退
+
+
+情景4：使用版本号，版本库版本回退
+
+git reflog                            //查看当前可以回退的版本号
+d42e6be HEAD@{2}: commit: 修改temp.txt 3333333333
+0717401 HEAD@{3}: commit: 修改temp.txt 2222222222
+3f96b90 HEAD@{4}: commit: 修改temp.txt 1111111
+0dd99d6 HEAD@{5}: commit: 提交temp.txt
+
+git reset --hard 3f96b90              //回退版本到 “修改temp.txt 1111111”
+
+git log                               //查看提交日志，确定版本是否已被回退
+
+
+情景5：撤销工作区修改
+
+git status                            //可查看当前工作区状态
+
+git checkout -- temp.txt              //把temp.txt文件在工作区做的修改全部撤销
+
+
+情景6：彻底从版本库中删除文件
+
+git add "temp.txt"                  //把"temp.txt"文件从 工作区 添加到 暂存区
+
+git commit -m "提交temp.txt"        //实际上就是把 暂存区 的所有内容提交到本地版本库
+
+git rm temp.txt                     //删除“temp.txt”文件，注意：此时还未真正删除，
+or                                    还可用git checkout -- temp.txt撤销删除
+rm temp.txt
+
+git commit -m                       //把"temp.txt"彻底从版本库中删除
+
+git rm ：          同时从工作区和索引中删除文件。即本地的文件也被删除了。
+git rm --cached ： 从索引中删除文件。但是本地文件还存在， 只是不希望这个文件被版本控制。
+rm：               删除文件，仅仅是删除了物理文件，没有将其从 git 的记录中剔除;
+
+
+情景7：撤回从版本库中删除的文件
+
+rm temp.txt                         //假如误删了“temp.txt”文件,只要在“rm”命令后没有执行“git commit”命令
+                                      就可以撤销删除
+git checkout -- temp.txt            //撤销删除命令
+
+git status                          //可查看当前工作区状态
+
+
+
+情景8：分支的创建与合并
+
+git branch                          //查看已有分支
+
+git branch dev                      //创建一个名字为“dev”的分支
+
+git checkout dev                    //切换到“dev”分支
+or
+git checkout -b dev                 //创建“dev”分支并切换
+
+git merge dev                       //Fast forward模式合并“dev”分支到当前分支
+or
+git merge –no-ff -m “注释” dev   //禁止”Fast forward”模式合并“dev”分支到当前分支
+
+git branch -d dev                   //删除“dev”分支
+
+git log --graph --pretty=oneline --abbrev-commit    //查看提交详细信息记录
+
+
+
+情景9：冲突解决：有master分支和dev分支两个分支，两个分支都修改了readme.txt文件，当合并dev到master时将报冲突
+
+git checkout dev                    //切换到“dev”分支
+
+cat readme.txt                      //模拟在非“master”分支中修改文件
+1111111111
+2222222222
+4444444444
+
+git checkout master                 //切换到“master”分支
+
+cat readme.txt                      //模拟在“master”分支中修改文件
+1111111111
+2222222222
+3333333333
+
+git merge dev                       //合并“dev”分支到当前分支
+Auto-merging readme.txt
+CONFLICT (content): Merge conflict in readme.txt
+Automatic merge failed; fix conflicts and then commit the result.
+
+cat readme.txt                      //冲突位置指示
+1111111111
+2222222222
+<<<<<<<HEAD
+3333333333
+=======
+4444444444
+>>>>>>>dev
+
+cat readme.txt                      //手动解决冲突并再次提交
+1111111111
+2222222222
+3333333333
+4444444444
+
+git add readme.txt
+
+git commit -m "conflict fixed"
+
+
+情景10：bug分支：隐藏“dev”分支未完成工作,中断新建“bug”分支解决bug
+
+git stash                         //隐藏当前分支未完成工作
+
+git stash list                    //查看当前分支工作是否被成功隐藏
+
+git checkout master               //回到“master”分支,新建“bug”分支解决bug
+git checkout -b bug               
+git add .
+git commit -m "dbug"
+
+git checkout dev                  //回到“dev”分支
+
+git stash list                    //查看隐藏工作区记录
+
+git stash apply                   //恢复隐藏工作区
+git stash drop                    //删除隐藏记录
+or
+git stash pop                     //恢复隐藏工作区，并删除隐藏记录
+
+git add .                         
+git commit -m "dev分支功能完成"
+
+
+
+
+
+
+情景11：本地git仓库 关联 远程GitHub仓库
+
+//查看主机家目录下是否有“id_rsa”和“id_rsa.pub”,  如果有说明此主机非第一次关联github,如果没有看下一步
+ls ~/.shh                           
+                                    
+//本地Git仓库和github仓库之间的传输是通过SSH加密的，所以需要生成ssh秘钥，-C 后是秘钥描述信息可以填其他内容。
+ssh-keygen -t rsa -C "jiawang_ding@163.com"  
+
+//默认秘钥文件放在 “(/home/sg/.ssh/id_rsa)”，如果自定义文件名秘钥将保存在当前目录;
+Enter file in which to save the key (/home/sg/.ssh/id_rsa): 
+
+//上面的命令执行成功后会生成id_rsa是私钥和id_rsa.pub是公钥，复制公钥文件内容到github->settings->SSH and GOG keys->new SSH key
+cat ~/.ssh/id_rsa.pub  
+
+//将本地git库关联到远程github库，“https://github.com/Jiawang-Ding/Jiagit.git”是远程github库的链接。（远程库需要在github上创建）
+git remote add origin https://github.com/Jiawang-Ding/Jiagit.git
+
+//当github库空且第一次推送时需要加上“-u”参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来。
+git push -u origin master 
+
+//非第一次关联推送不用加“-u”，将本地git仓库内容推送到远程github仓库
+git push origin master
+
+
+情景12：将远程GitHub仓库克隆到本地主机
+
+git clone https://github.com/Jiawang-Ding/Jiagit  
+
+
+
+
+
+
+             
+
+
+
+
+
+
+
