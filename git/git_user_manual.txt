@@ -147,7 +147,7 @@ git checkout -b dev                 //创建“dev”分支并切换
 
 git merge dev                       //Fast forward模式合并“dev”分支到当前分支
 or
-git merge –no-ff -m “注释” dev   //禁止”Fast forward”模式合并“dev”分支到当前分支
+git merge --no-ff -m “注释” dev   //禁止”Fast forward”模式合并“dev”分支到当前分支
 
 git branch -d dev                   //删除“dev”分支
 
