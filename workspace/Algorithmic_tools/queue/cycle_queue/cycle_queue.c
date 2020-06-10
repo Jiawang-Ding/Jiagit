@@ -27,6 +27,10 @@ struct cycle_queue * cycle_queue_alloc(unsigned int size)
 
 void cycle_queue_free(cycle_queue_t queue)
 {
+    if(queue == NULL)
+        return;
+    if(queue->data == NULL)
+        return;
     free(queue->data);
     free(queue);
 }
@@ -74,9 +78,42 @@ int cycle_queue_out(cycle_queue_t queue, TYPE *pvalue)
     return 0;
 }
 
-int cycle_queue_len_get(cycle_queue_t queue)
+unsigned int cycle_queue_len(cycle_queue_t queue)
 {
     return ((queue->rear - queue->front + queue->size) % queue->size);
 }
 
+unsigned int cycle_queue_size(cycle_queue_t queue)
+{
+    return (queue->size);
+}
 
+unsigned int cycle_queue_avail(cycle_queue_t queue)
+{
+    return (cycle_queue_size(queue) - cycle_queue_len(queue));
+}
+
+
+int cycle_queue_in_locked(cycle_queue_t queue, TYPE value, pthread_mutex_t *f_lock)
+{
+    int ret;
+    pthread_mutex_lock(f_lock);
+
+    ret = cycle_queue_in(queue, value);
+
+    pthread_mutex_unlock(f_lock);
+
+    return ret;
+}
+
+int cycle_queue_out_locked(cycle_queue_t queue, TYPE *pvalue, pthread_mutex_t *f_lock)
+{
+    int ret;
+    pthread_mutex_lock(f_lock);
+
+    ret = cycle_queue_out(queue, pvalue);
+
+    pthread_mutex_unlock(f_lock);
+
+    return ret;
+}
