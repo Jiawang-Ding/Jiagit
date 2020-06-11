@@ -7,9 +7,8 @@
 #include <pthread.h>
 
 #if 1 
-pthread_mutex_t queue_mutex;
 
-void print_cube_info(struct cube* cube)
+void print_cube_info(struct cube *cube)
 {
     printf("name  :%s\n", cube->name);
     printf("length:%d\n", cube->length);
@@ -33,18 +32,24 @@ struct cube *get_cube_info(time_t timer)
 void *producer_pro(void *arg)
 {
     int err;
+    static int cnt = 10;
     time_t cur_time;
     struct cube *pvalue;
     struct cycle_queue *pqueue = (struct cycle_queue*)arg;
 
     while(1)
     {
+        if(0 == cnt--){
+            /* end cont exit */
+            pthread_exit(NULL);
+        }
+
         time(&cur_time);
         srand(cur_time);
         int seed = rand() % 11111;
         printf("************************* in ************************\n");
         pvalue = get_cube_info(seed+cur_time);
-        err = cycle_queue_in_locked(pqueue, *pvalue, &queue_mutex);
+        err = cycle_queue_in_locked(pqueue, *pvalue);
         if(err == 1){
             printf("queue is full\n");
             sleep(2);
@@ -54,6 +59,7 @@ void *producer_pro(void *arg)
         printf("queue len : %d \n", cycle_queue_len(pqueue));
         printf("*********************** in end ***********************\n\n");
         sleep(1);
+
     }
     return (void*)pqueue;
 }
@@ -65,17 +71,18 @@ void *consumer_pro(void *arg)
     struct cycle_queue *pqueue = (struct cycle_queue*)arg;
     while(1)
     {
+        sleep(1);
         printf("************************ out ************************\n");
-        err = cycle_queue_out_locked(pqueue, &value, &queue_mutex);
+        err = cycle_queue_out_locked(pqueue, &value);
         if(err == 1){
             printf("queue in empty\n");
-            sleep(2);
+            pthread_exit(NULL);
+            //sleep(2);
         }else{
             print_cube_info(&value);
         }
         printf("queue len : %d \n", cycle_queue_len(pqueue));
         printf("********************** out end **********************\n\n");
-        sleep(1);
     }
     return (void*)pqueue;
 }
@@ -112,6 +119,7 @@ int main(void)
     int ret;
     struct cycle_queue *pqueue=NULL;
     pthread_t consume_pid, produce_pid;
+    pthread_mutex_t queue_mutex;
 
     ret = pthread_mutex_init(&queue_mutex, NULL);
     if(ret){
@@ -119,7 +127,7 @@ int main(void)
         return -1;
     }
 
-    pqueue = cycle_queue_alloc(6);
+    pqueue = cycle_queue_alloc(6, &queue_mutex);
     if(pqueue == NULL){
         printf("cycle_queue alloc failed\n");
         return -1;
@@ -140,23 +148,24 @@ int main(void)
 
     cycle_queue_free(pqueue);
     pthread_mutex_destroy(&queue_mutex);
+    printf("cycle queue test end...\n");
 
     return 0;
 }
 
 #else
 
-void init_type(TYPE* queue);
-void print_type(TYPE* queue);
+void init_type(TYPE_T *queue);
+void print_type(TYPE_T *queue);
 
 int main(void)
 {
     struct cycle_queue *pqueue;
     int i,ret;
-    TYPE value;
+    TYPE_T value;
 
     
-    printf("TYPE : %ld\n", sizeof(TYPE));
+    printf("TYPE : %ld\n", sizeof(TYPE_T));
 
     pqueue = cycle_queue_alloc(6);
     if(pqueue == NULL){
@@ -198,7 +207,7 @@ int main(void)
     return 0;
 }
 
-void init_type(TYPE* queue)
+void init_type(TYPE_T *queue)
 {
     printf("please enter name:\n");
     gets(queue->name);
@@ -208,7 +217,7 @@ void init_type(TYPE* queue)
     while(getchar() != '\n'){;}
 }
 
-void print_type(TYPE* queue)
+void print_type(TYPE_T *queue)
 {
     printf("name  :%s\n", queue->name);
     printf("length:%d\n", queue->length);
