@@ -4,7 +4,7 @@ CROSSCOMPILE :=
 CFLAGS 	:= -Wall -O2 -c
 CFLAGS  += -I$(PWD)/.
 
-#LDFLAGS := -lm -lfreetype
+LDFLAGS := -pthread 
 
 CC 	:= $(CROSSCOMPILE)gcc
 LD 	:= $(CROSSCOMPILE)ld
