@@ -1,6 +1,7 @@
 #include "cycle_queue.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 struct cycle_queue * cycle_queue_alloc(unsigned int size)
 {
@@ -58,7 +59,7 @@ int cycle_queue_is_full(cycle_queue_t queue)
 int cycle_queue_in(cycle_queue_t queue, TYPE value)
 {
     if(cycle_queue_is_full(queue)){
-        return -1;
+        return 1;
     }
 
     queue->data[queue->rear] = value;
@@ -69,8 +70,9 @@ int cycle_queue_in(cycle_queue_t queue, TYPE value)
 
 int cycle_queue_out(cycle_queue_t queue, TYPE *pvalue)
 {
-    if(cycle_queue_is_empty(queue))
-        return -1;
+    if(cycle_queue_is_empty(queue)){
+        return 1;
+    }
 
     *pvalue = queue->data[queue->front];
     queue->front = (queue->front+1) % queue->size;

@@ -2,12 +2,13 @@
 #define _CYCLE_QUEUE_H
 #include <pthread.h>
 
-typedef struct{
+struct cube{
     char name[10];
     int length;
     int high;
     int width; 
-}TYPE;
+};
+typedef struct cube TYPE;
 
 struct cycle_queue{
     TYPE *data;
