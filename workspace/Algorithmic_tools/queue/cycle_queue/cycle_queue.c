@@ -8,13 +8,9 @@
  * @queue address of the queue to be used
  * @pbuff queue element buffer pointer
  * @size  number of queue elements
- * @plock queue thread mutex pointer
  *
  */
-void cycle_queue_init(cycle_queue_t *queue, 
-                        TYPE_T* pbuff, 
-                        unsigned int size,
-                        pthread_mutex_t *plock)
+void cycle_queue_init(cycle_queue_t *queue, TYPE_T* pbuff, unsigned int size)
 {
     if(queue == NULL || pbuff == NULL)
         return;
@@ -22,16 +18,14 @@ void cycle_queue_init(cycle_queue_t *queue,
     queue->front = 0;
     queue->rear = 0;
     queue->size = size;
-    queue->plock = plock;
 }
 
 /**                                                                                                  
  * This function will creat a cycle queue
  * @size  number of queue elements
- * @plock queue thread mutex pointer
  * @return address of the queue to be used
  */
-struct cycle_queue * cycle_queue_alloc(unsigned int size, pthread_mutex_t *plock)
+struct cycle_queue * cycle_queue_alloc(unsigned int size)
 {
     struct cycle_queue *pqueue;
     TYPE_T *pdata;
@@ -46,7 +40,7 @@ struct cycle_queue * cycle_queue_alloc(unsigned int size, pthread_mutex_t *plock
         return NULL;
     }
 
-    cycle_queue_init(pqueue, pdata, size, plock);
+    cycle_queue_init(pqueue, pdata, size);
 
     return pqueue;
 }
@@ -153,19 +147,20 @@ unsigned int cycle_queue_avail(cycle_queue_t *queue)
  * Put element into the queue safely
  * @queue address of the queue to be used
  * @value enqueue elements 
+ * @plock queue thread mutex pointer
  * @return true non-zero, false zero 
  */
-int cycle_queue_in_locked(cycle_queue_t *queue, TYPE_T value)
+int cycle_queue_in_locked(cycle_queue_t *queue, TYPE_T value, pthread_mutex_t *plock)
 {
     int ret;
 
-    if(queue->plock == NULL)
+    if(plock == NULL)
         return -2;
-    pthread_mutex_lock(queue->plock);
+    pthread_mutex_lock(plock);
 
     ret = cycle_queue_in(queue, value);
 
-    pthread_mutex_unlock(queue->plock);
+    pthread_mutex_unlock(plock);
 
     return ret;
 }
@@ -174,19 +169,84 @@ int cycle_queue_in_locked(cycle_queue_t *queue, TYPE_T value)
  * Get element from the queue safely
  * @queue address of the queue to be used
  * @value enqueue elements 
+ * @plock queue thread mutex pointer
  * @return true non-zero, false zero 
  */
-int cycle_queue_out_locked(cycle_queue_t *queue, TYPE_T *pvalue)
+int cycle_queue_out_locked(cycle_queue_t *queue, TYPE_T *pvalue, pthread_mutex_t *plock)
 {
     int ret;
 
-    if(queue->plock == NULL)
+    if(plock == NULL)
         return -2;
-    pthread_mutex_lock(queue->plock);
+    pthread_mutex_lock(plock);
 
     ret = cycle_queue_out(queue, pvalue);
 
-    pthread_mutex_unlock(queue->plock);
+    pthread_mutex_unlock(plock);
 
     return ret;
 }
+
+/**                                                                                             
+ * returns the number of used elements in the queue safely
+ * @queue address of the queue to be used
+ * @plock queue thread mutex pointer
+ */
+unsigned int cycle_queue_len_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
+{
+    unsigned int ret;
+
+    if(plock == NULL)
+        return -2;
+    pthread_mutex_lock(plock);
+
+    ret = cycle_queue_len(queue);
+
+    pthread_mutex_unlock(plock);
+
+    return ret;
+}
+
+/**                                                                                         
+ * returns the number of all elements in the queue safely
+ * @queue address of the queue to be used
+ * @plock queue thread mutex pointer
+ */
+unsigned int cycle_queue_size_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
+{
+    unsigned int ret;
+
+    if(plock == NULL)
+        return -2;
+    pthread_mutex_lock(plock);
+
+    ret = cycle_queue_size(queue);
+
+    pthread_mutex_unlock(plock);
+
+    return ret;
+
+}
+
+/**                                                                                     
+ * returns the number of unused elements in the queue safely
+ * @queue address of the queue to be used
+ * @plock queue thread mutex pointer
+ */
+unsigned int cycle_queue_avail_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
+{
+    unsigned int ret;
+
+    if(plock == NULL)
+        return -2;
+    pthread_mutex_lock(plock);
+
+    ret = cycle_queue_avail(queue);
+
+    pthread_mutex_unlock(plock);
+
+    return ret;
+}
+
+
+

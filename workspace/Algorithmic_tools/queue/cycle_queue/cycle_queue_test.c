@@ -8,6 +8,8 @@
 
 #if 1 
 
+pthread_mutex_t queue_mutex;
+
 void print_cube_info(struct cube *cube)
 {
     printf("name  :%s\n", cube->name);
@@ -49,14 +51,14 @@ void *producer_pro(void *arg)
         int seed = rand() % 11111;
         printf("************************* in ************************\n");
         pvalue = get_cube_info(seed+cur_time);
-        err = cycle_queue_in_locked(pqueue, *pvalue);
+        err = cycle_queue_in_locked(pqueue, *pvalue, &queue_mutex);
         if(err == 1){
             printf("queue is full\n");
             sleep(2);
         }else{
             print_cube_info(pvalue);
         }
-        printf("queue len : %d \n", cycle_queue_len(pqueue));
+        printf("queue len : %d \n", cycle_queue_len_locked(pqueue, &queue_mutex));
         printf("*********************** in end ***********************\n\n");
         sleep(1);
 
@@ -73,7 +75,7 @@ void *consumer_pro(void *arg)
     {
         sleep(1);
         printf("************************ out ************************\n");
-        err = cycle_queue_out_locked(pqueue, &value);
+        err = cycle_queue_out_locked(pqueue, &value, &queue_mutex);
         if(err == 1){
             printf("queue in empty\n");
             pthread_exit(NULL);
@@ -81,7 +83,7 @@ void *consumer_pro(void *arg)
         }else{
             print_cube_info(&value);
         }
-        printf("queue len : %d \n", cycle_queue_len(pqueue));
+        printf("queue len : %d \n", cycle_queue_len_locked(pqueue, &queue_mutex));
         printf("********************** out end **********************\n\n");
     }
     return (void*)pqueue;
@@ -119,7 +121,6 @@ int main(void)
     int ret;
     struct cycle_queue *pqueue=NULL;
     pthread_t consume_pid, produce_pid;
-    pthread_mutex_t queue_mutex;
 
     ret = pthread_mutex_init(&queue_mutex, NULL);
     if(ret){
@@ -127,7 +128,7 @@ int main(void)
         return -1;
     }
 
-    pqueue = cycle_queue_alloc(6, &queue_mutex);
+    pqueue = cycle_queue_alloc(6);
     if(pqueue == NULL){
         printf("cycle_queue alloc failed\n");
         return -1;

@@ -17,7 +17,6 @@ struct cycle_queue{
     unsigned int front;
     unsigned int rear;
     unsigned int size;
-    pthread_mutex_t *plock;
 };
 
 typedef struct cycle_queue cycle_queue_t;
@@ -27,21 +26,16 @@ typedef struct cycle_queue cycle_queue_t;
  * @queue address of the queue to be used
  * @pbuff queue element buffer pointer
  * @size  number of queue elements
- * @plock queue thread mutex pointer
  *
  */
-void cycle_queue_init(cycle_queue_t *queue, 
-                      TYPE_T *pbuff, 
-                      unsigned int size, 
-                      pthread_mutex_t *plock);
+void cycle_queue_init(cycle_queue_t *queue, TYPE_T *pbuff, unsigned int size);
 
 /**                                                                             
  * This function will creat a cycle queue
  * @size  number of queue elements
- * @plock queue thread mutex pointer
  * @return address of the queue to be used
  */
-struct cycle_queue * cycle_queue_alloc(unsigned int size, pthread_mutex_t *plock);
+struct cycle_queue * cycle_queue_alloc(unsigned int size);
 
 /**                                                                                             
  * This function will release cycle queue memory
@@ -59,28 +53,12 @@ void cycle_queue_free(cycle_queue_t *queue);
 int cycle_queue_in(cycle_queue_t *queue, TYPE_T value);
 
 /**                                                                                         
- * Put element into the queue safely
- * @queue address of the queue to be used
- * @value enqueue elements 
- * @return true non-zero, false zero 
- */
-int cycle_queue_in_locked(cycle_queue_t *queue, TYPE_T value);
-
-/**                                                                                         
  * Get element from the queue 
  * @queue address of the queue to be used
  * @value enqueue elements 
  * @return true non-zero, false zero 
  */
 int cycle_queue_out(cycle_queue_t *queue, TYPE_T *pvalue);
-
-/**                                                                                     
- * Get element from the queue safely
- * @queue address of the queue to be used
- * @value enqueue elements 
- * @return true non-zero, false zero 
- */
-int cycle_queue_out_locked(cycle_queue_t *queue, TYPE_T *pvalue);
 
 /**                                                                                             
  * This function will check the queue empty status
@@ -113,5 +91,45 @@ unsigned int cycle_queue_size(cycle_queue_t *queue);
  * @queue address of the queue to be used
  */
 unsigned int cycle_queue_avail(cycle_queue_t *queue);
+
+/**                                                                                         
+ * Put element into the queue safely
+ * @queue address of the queue to be used
+ * @value enqueue elements 
+ * @plock queue thread mutex pointer
+ * @return true non-zero, false zero 
+ */
+int cycle_queue_in_locked(cycle_queue_t *queue, TYPE_T value, pthread_mutex_t *plock);
+
+/**                                                                                     
+ * Get element from the queue safely
+ * @queue address of the queue to be used
+ * @value enqueue elements 
+ * @plock queue thread mutex pointer
+ * @return true non-zero, false zero 
+ */
+int cycle_queue_out_locked(cycle_queue_t *queue, TYPE_T *pvalue, pthread_mutex_t *plock);
+
+/**                                                                                             
+ * returns the number of used elements in the queue safely
+ * @queue address of the queue to be used
+ * @plock queue thread mutex pointer
+ */
+unsigned int cycle_queue_len_locked(cycle_queue_t *queue, pthread_mutex_t *plock);
+
+/**                                                                                         
+ * returns the number of all elements in the queue safely
+ * @queue address of the queue to be used
+ * @plock queue thread mutex pointer
+ */
+unsigned int cycle_queue_size_locked(cycle_queue_t *queue, pthread_mutex_t *plock);
+
+/**                                                                                     
+ * returns the number of unused elements in the queue safely
+ * @queue address of the queue to be used
+ * @plock queue thread mutex pointer
+ */
+unsigned int cycle_queue_avail_locked(cycle_queue_t *queue, pthread_mutex_t *plock);
+
 
 #endif
