@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 /* 链表初始化 */
-int dlist_init(struct dlist_node* p_head)
+int32_t dlist_init(struct dlist_node* p_head)
 {
     if(p_head == NULL){
         return -1;
@@ -31,7 +31,7 @@ dlist_t *dlist_creat_node(void)
 }
 
 /* 删除一个节点 */
-int dlist_delete_node(dlist_t *p_node)
+int32_t dlist_delete_node(dlist_t *p_node)
 {
     if(p_node == NULL){
         return -1;
@@ -48,7 +48,7 @@ int dlist_delete_node(dlist_t *p_node)
 
 
 /* 链表后插入一个节点 */
-int dlist_insert_after(dlist_t *p_pos, dlist_t *p_node)
+int32_t dlist_insert_after(dlist_t *p_pos, dlist_t *p_node)
 {
     if(p_pos == NULL || p_node == NULL){
         return -1;
@@ -63,7 +63,7 @@ int dlist_insert_after(dlist_t *p_pos, dlist_t *p_node)
 }
 
 /* 链表前插入一个节点 */
-int dlist_insert_before(dlist_t *p_pos, dlist_t *p_node)
+int32_t dlist_insert_before(dlist_t *p_pos, dlist_t *p_node)
 {
     if(p_pos == NULL || p_node == NULL){
         return -1;
@@ -78,7 +78,7 @@ int dlist_insert_before(dlist_t *p_pos, dlist_t *p_node)
 }
 
 /* 从链表移除一个节点 */
-int dlist_remove(dlist_t *p_node)
+int32_t dlist_remove(dlist_t *p_node)
 {
     if(p_node == NULL){
         return -1;
@@ -94,7 +94,7 @@ int dlist_remove(dlist_t *p_node)
 }
 
 /* 检查一个链表是否为空 */
-int dlist_isempty(const dlist_t *p_node)
+int32_t dlist_isempty(const dlist_t *p_node)
 {
     if(p_node == NULL){
         return -1;
@@ -107,9 +107,9 @@ int dlist_isempty(const dlist_t *p_node)
 }
 
 /* 获取一个链表长度 */
-unsigned int dlist_len(const dlist_t *p_node)
+uint32_t dlist_len(const dlist_t *p_node)
 {
-    unsigned int len = 0;
+    uint32_t len = 0;
     dlist_t *p_tmp = p_node->next;
 
     if(p_node == NULL){
@@ -146,11 +146,11 @@ dlist_t *dlist_next_get(dlist_t *p_node)
 
 
 /* 遍历链表 */
-int dlist_foreach(dlist_t *p_head, dlist_node_process p_fun_process, void *p_arg)
+int32_t dlist_foreach(dlist_t *p_head, dlist_node_process p_fun_process, void *p_arg)
 {
 
     struct dlist_node *p_tmp = p_head->next;
-    int ret;
+    int32_t ret;
 
     if(p_head == NULL || p_fun_process == NULL){
         return -1;

@@ -39,7 +39,7 @@ int main(void)
     dlist_t *tmp;
     dlist_for_each(tmp, &list_page)
     {
-        page_t page = (page_t)tmp;
+        page_t *page = (page_t*)tmp;
         printf("page_nums:%d page_entry:%x\n", 
                 page->page_num, page->disp_entry);
     }
@@ -53,7 +53,7 @@ int main(void)
 
 
     /* list node find test */
-    p_tmp = page_number_find((page_t)&list_page, 6);
+    p_tmp = page_number_find((page_t*)&list_page, 6);
     if(p_tmp)
     printf("find : id:%d,%x\n",p_tmp->page_num, p_tmp->disp_entry);
 
@@ -68,7 +68,6 @@ int main(void)
 
 
     /* list foreach test */
-    printf("delete a page_info node!\n");
     ret = dlist_foreach(&list_page, int_node_process , NULL);
     if(ret){
         printf("dlist for each error!\n");
@@ -78,7 +77,7 @@ int main(void)
 
     /* list delete test */
     printf("start free page_info node!\n");
-    page_delete_all((page_t)&list_page);
+    page_delete_all((page_t*)&list_page);
     printf("end free page_info node!\n");
     
     return 0;

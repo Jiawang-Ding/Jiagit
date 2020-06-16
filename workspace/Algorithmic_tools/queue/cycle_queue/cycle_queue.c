@@ -10,7 +10,7 @@
  * @size  number of queue elements
  *
  */
-void cycle_queue_init(cycle_queue_t *queue, TYPE_T* pbuff, unsigned int size)
+void cycle_queue_init(cycle_queue_t *queue, TYPE_T* pbuff, uint32_t size)
 {
     if(queue == NULL || pbuff == NULL)
         return;
@@ -25,7 +25,7 @@ void cycle_queue_init(cycle_queue_t *queue, TYPE_T* pbuff, unsigned int size)
  * @size  number of queue elements
  * @return address of the queue to be used
  */
-struct cycle_queue * cycle_queue_alloc(unsigned int size)
+struct cycle_queue * cycle_queue_alloc(uint32_t size)
 {
     struct cycle_queue *pqueue;
     TYPE_T *pdata;
@@ -64,7 +64,7 @@ void cycle_queue_free(cycle_queue_t *queue)
  * @queue address of the queue to be used
  * @return true non-zero, false zero 
  */
-int cycle_queue_is_empty(cycle_queue_t *queue)
+int32_t cycle_queue_is_empty(cycle_queue_t *queue)
 {
     return (queue->front == queue->rear);
 }
@@ -74,7 +74,7 @@ int cycle_queue_is_empty(cycle_queue_t *queue)
  * @queue address of the queue to be used
  * @return true non-zero, false zero 
  */
-int cycle_queue_is_full(cycle_queue_t *queue)
+int32_t cycle_queue_is_full(cycle_queue_t *queue)
 {
     return (((queue->rear+1) % queue->size) == queue->front);
 }
@@ -85,7 +85,7 @@ int cycle_queue_is_full(cycle_queue_t *queue)
  * @value enqueue elements 
  * @return true non-zero, false zero 
  */
-int cycle_queue_in(cycle_queue_t *queue, TYPE_T value)
+int32_t cycle_queue_in(cycle_queue_t *queue, TYPE_T value)
 {
     if(cycle_queue_is_full(queue)){
         return 1;
@@ -103,7 +103,7 @@ int cycle_queue_in(cycle_queue_t *queue, TYPE_T value)
  * @value enqueue elements 
  * @return true non-zero, false zero 
  */
-int cycle_queue_out(cycle_queue_t *queue, TYPE_T *pvalue)
+int32_t cycle_queue_out(cycle_queue_t *queue, TYPE_T *pvalue)
 {
     if(cycle_queue_is_empty(queue)){
         return 1;
@@ -119,7 +119,7 @@ int cycle_queue_out(cycle_queue_t *queue, TYPE_T *pvalue)
  * returns the number of used elements in the queue
  * @queue address of the queue to be used
  */
-unsigned int cycle_queue_len(cycle_queue_t *queue)
+uint32_t cycle_queue_len(cycle_queue_t *queue)
 {
     return ((queue->rear - queue->front + queue->size) % queue->size);
 }
@@ -128,7 +128,7 @@ unsigned int cycle_queue_len(cycle_queue_t *queue)
  * returns the number of all elements in the queue
  * @queue address of the queue to be used
  */
-unsigned int cycle_queue_size(cycle_queue_t *queue)
+uint32_t cycle_queue_size(cycle_queue_t *queue)
 {
     return (queue->size);
 }
@@ -137,7 +137,7 @@ unsigned int cycle_queue_size(cycle_queue_t *queue)
  * returns the number of unused elements in the queue
  * @queue address of the queue to be used
  */
-unsigned int cycle_queue_avail(cycle_queue_t *queue)
+uint32_t cycle_queue_avail(cycle_queue_t *queue)
 {
     return (cycle_queue_size(queue) - cycle_queue_len(queue));
 }
@@ -147,12 +147,12 @@ unsigned int cycle_queue_avail(cycle_queue_t *queue)
  * Put element into the queue safely
  * @queue address of the queue to be used
  * @value enqueue elements 
- * @plock queue thread mutex pointer
+ * @plock queue thread mutex lock pointer
  * @return true non-zero, false zero 
  */
-int cycle_queue_in_locked(cycle_queue_t *queue, TYPE_T value, pthread_mutex_t *plock)
+int32_t cycle_queue_in_locked(cycle_queue_t *queue, TYPE_T value, pthread_mutex_t *plock)
 {
-    int ret;
+    int32_t ret;
 
     if(plock == NULL)
         return -2;
@@ -169,12 +169,12 @@ int cycle_queue_in_locked(cycle_queue_t *queue, TYPE_T value, pthread_mutex_t *p
  * Get element from the queue safely
  * @queue address of the queue to be used
  * @value enqueue elements 
- * @plock queue thread mutex pointer
+ * @plock queue thread mutex lock pointer
  * @return true non-zero, false zero 
  */
-int cycle_queue_out_locked(cycle_queue_t *queue, TYPE_T *pvalue, pthread_mutex_t *plock)
+int32_t cycle_queue_out_locked(cycle_queue_t *queue, TYPE_T *pvalue, pthread_mutex_t *plock)
 {
-    int ret;
+    int32_t ret;
 
     if(plock == NULL)
         return -2;
@@ -190,11 +190,11 @@ int cycle_queue_out_locked(cycle_queue_t *queue, TYPE_T *pvalue, pthread_mutex_t
 /**                                                                                             
  * returns the number of used elements in the queue safely
  * @queue address of the queue to be used
- * @plock queue thread mutex pointer
+ * @plock queue thread mutex lock pointer
  */
-unsigned int cycle_queue_len_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
+uint32_t cycle_queue_len_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
 {
-    unsigned int ret;
+    uint32_t ret;
 
     if(plock == NULL)
         return -2;
@@ -210,11 +210,11 @@ unsigned int cycle_queue_len_locked(cycle_queue_t *queue, pthread_mutex_t *plock
 /**                                                                                         
  * returns the number of all elements in the queue safely
  * @queue address of the queue to be used
- * @plock queue thread mutex pointer
+ * @plock queue thread mutex lock pointer
  */
-unsigned int cycle_queue_size_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
+uint32_t cycle_queue_size_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
 {
-    unsigned int ret;
+    uint32_t ret;
 
     if(plock == NULL)
         return -2;
@@ -231,11 +231,11 @@ unsigned int cycle_queue_size_locked(cycle_queue_t *queue, pthread_mutex_t *ploc
 /**                                                                                     
  * returns the number of unused elements in the queue safely
  * @queue address of the queue to be used
- * @plock queue thread mutex pointer
+ * @plock queue thread mutex lock pointer
  */
-unsigned int cycle_queue_avail_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
+uint32_t cycle_queue_avail_locked(cycle_queue_t *queue, pthread_mutex_t *plock)
 {
-    unsigned int ret;
+    uint32_t ret;
 
     if(plock == NULL)
         return -2;

@@ -4,19 +4,19 @@ CROSSCOMPILE :=
 CFLAGS 	:= -Wall -O2 -c
 CFLAGS  += -I$(PWD)/.
 
-#LDFLAGS := -lm -lfreetype
+LDFLAGS := -pthread 
 
 CC 	:= $(CROSSCOMPILE)gcc
 LD 	:= $(CROSSCOMPILE)ld
 
-OBJS :=fifo.o \
-	   fifo_test.o \
+OBJS :=rfifo.o \
+	   rfifo_test.o \
 
 all: $(OBJS)
-	$(CC) $(LDFLAGS) -o test_fifo $^
+	$(CC) $(LDFLAGS) -o test_rfifo $^
 
 clean:
-	rm -f test_fifo 
+	rm -f test_rfifo 
 	rm -f $(OBJS)
 
 %.o:%.c
